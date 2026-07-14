@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import {
   getUsers,
+  getUserById,
   createUser,
   updateUser,
   deleteUser
@@ -12,6 +13,7 @@ import {
 export default function UsuariosPage() {
 
   const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
     username: "",
@@ -19,21 +21,62 @@ export default function UsuariosPage() {
     password: "",
     profile: "PROFESSOR"
   });
-
+  const [user, setUser] = useState(null);
 
   async function loadUsers() {
-    try {
+
+  try {
+    
+    const loggedUser = JSON.parse(
+      localStorage.getItem("user")
+    );
+
+
+    if(
+      loggedUser.profile === "ADMIN" ||
+      loggedUser.profile === "PROFESSOR"
+    ){
+
       const data = await getUsers();
+
       setUsers(data);
-    } catch (error) {
-      alert(error.message);
+
+    } else {
+
+      const data = await getUserById(
+        loggedUser.id
+      );
+
+      setUsers([data]);
+
     }
+
+
+  } catch(error){
+
+    alert(error.message);
+
   }
+
+}
 
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+
+  const savedUser = localStorage.getItem("user");
+
+  if(savedUser){
+
+    const loggedUser = JSON.parse(savedUser);
+
+    setCurrentUser(loggedUser);
+    setUser(loggedUser);
+
+  }
+
+  loadUsers();
+
+}, []);
 
 
   function handleChange(e) {
@@ -140,6 +183,7 @@ function handleEdit(user) {
 
   }
 
+  const isAdmin = currentUser?.profile === "ADMIN";
 
   return (
     <main>
@@ -148,11 +192,9 @@ function handleEdit(user) {
 
       <h1>Usuários</h1>
 
-
-      <section>
-
         <h2>Novo usuário</h2>
-
+        {isAdmin && (
+        <>
 
         <input
           name="username"
@@ -212,8 +254,9 @@ function handleEdit(user) {
         <button onClick={handleCreate}>
             {editingId ? "Atualizar" : "Criar"}
         </button>
-
-      </section>
+          <hr />
+          </>
+        )}
 
 
 
@@ -257,9 +300,11 @@ function handleEdit(user) {
                   Editar
                 </button>
 
+                {currentUser?.profile === "ADMIN" && (
                 <button onClick={() => handleDelete(user.id)}>
                   Excluir
                 </button>
+)}
 
               </td>
 

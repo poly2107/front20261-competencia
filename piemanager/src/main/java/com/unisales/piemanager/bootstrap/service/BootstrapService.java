@@ -93,8 +93,8 @@ public class BootstrapService {
             usersSeeded++;
         }
 
-        boolean missingCoordenador = userRepository.findByEmail("coordenador@unisales.br").isEmpty();
-        User coordenador = ensureUser("coordenador", "coordenador@unisales.br", Profile.COORDENADOR);
+        boolean missingCoordenador = userRepository.findByEmail("marceloschuster@unisales.br").isEmpty();
+        User coordenador = ensureUser("Marcelo Schuster", "marceloschuster@unisales.br", Profile.COORDENADOR);
         if (missingCoordenador) {
             usersSeeded++;
         }
