@@ -26,7 +26,6 @@ export default function LoginPage() {
     localStorage.setItem("token", data.accessToken);
     localStorage.setItem("user", JSON.stringify(data.user));
 
-    alert("Login realizado com sucesso!");
 
     router.push("/");
   } catch (error) {
