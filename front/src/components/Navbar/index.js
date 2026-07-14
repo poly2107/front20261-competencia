@@ -21,6 +21,14 @@ export default function Navbar() {
         Usuários
       </button>
 
+      <button onClick={() => router.push("/cursos")}>
+        Cursos
+      </button>
+
+      <button onClick={() => router.push("/projetos")}>
+        Projetos
+      </button>
+
       <button onClick={() => router.push("/locais")}>
         Locais
       </button>
