@@ -104,7 +104,12 @@ export default function UsuariosPage() {
   if (!editingId && !form.email.trim()) {
     alert("O email é obrigatório.");
     return;
-}
+ }
+
+  if (!editingId && !form.email.includes("@")) {
+    alert("O email informado é inválido.");
+    return;
+  }
 
   if (!editingId && form.password.length < 6) {
     alert("A senha deve possuir no mínimo 6 caracteres.");

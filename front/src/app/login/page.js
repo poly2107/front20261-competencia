@@ -31,8 +31,8 @@ export default function LoginPage() {
 
     router.push("/home");
   } catch (error) {
-    alert(error.message);
-  }
+      alert("Usuário e/ou senha inválidos");
+      }
 };
 
     const loadBootstrap = async () => {
