@@ -1,21 +1,11 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import "./navbar.css";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
 
   const router = useRouter();
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
 
   function logout() {
     localStorage.removeItem("token");
@@ -24,16 +14,17 @@ export default function Navbar() {
   }
 
   return (
-    <nav style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "20px" }}>
+    <nav className="navbar">
+
+      <button onClick={() => router.push("/home")}>
+        Início
+      </button>
 
       <button onClick={logout}>
         Sair
       </button>
 
-      <button onClick={() => router.push("/home")}>
-       Home
-      </button>
-
     </nav>
   );
+
 }

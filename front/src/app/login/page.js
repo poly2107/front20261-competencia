@@ -1,4 +1,6 @@
 'use client';
+
+import "./login.css";
 import { login } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -55,11 +57,42 @@ export default function LoginPage() {
 };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <FormInput label="Email" type="email" name="email" value={user.email} onChange={handleChange} />
-      <FormInput label="Password" type="password" name="password" value={user.password} onChange={handleChange} />
-      <Button type="submit" onClick={authenticate}>Login</Button>
+    <div className="login-container">
+
+  <div className="login-card">
+
+    <h1>PIE Manager</h1>
+
+    <p>
+      Sistema de Gestão de Projetos Integradores
+    </p>
+
+    <FormInput
+      label="Email"
+      type="email"
+      name="email"
+      value={user.email}
+      onChange={handleChange}
+    />
+
+    <FormInput
+      label="Senha"
+      type="password"
+      name="password"
+      value={user.password}
+      onChange={handleChange}
+    />
+
+    <div className="login-buttons">
+
+      <Button onClick={authenticate}>
+        Entrar
+      </Button>
+
     </div>
+
+  </div>
+
+</div>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import "./usuarios.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
@@ -14,6 +15,7 @@ import {
 export default function UsuariosPage() {
 
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -202,81 +204,120 @@ function handleEdit(user) {
 
   const isAdmin = currentUser?.profile === "ADMIN";
 
+  const canEditUser = (user) => {
+
+  if(currentUser?.profile === "ADMIN"){
+    return true;
+  }
+
+
+  return currentUser?.id === user.id;
+
+    };
+
+    const filteredUsers = users.filter((user)=>{
+
+    return (
+
+    String(user.id).includes(search) ||
+
+    user.username
+    .toLowerCase()
+    .includes(search.toLowerCase())
+
+    );
+
+    });
+
   return (
-    <main>
+    <main className="page-container">
 
       <Navbar />
 
-      <h1>Usuários</h1>
+      <h1 className="page-title">
+        Usuários
+      </h1>
 
-        {isAdmin && (
-          <button onClick={() => setShowForm(true)}>
-            Novo usuário
-          </button>
-)}
+        <div className="top-bar">
+
+  <input
+    className="search"
+    placeholder="Buscar por ID ou nome"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  {isAdmin && (
+    <button onClick={() => setShowForm(true)}>
+      + Novo usuário
+    </button>
+  )}
+
+</div>
         {showForm && (
-        <>
+  <div className="form-card">
 
-        <input
-          name="username"
-          placeholder="Nome"
-          value={form.username}
-          onChange={handleChange}
-        />
+    <input
+      name="username"
+      placeholder="Nome"
+      value={form.username}
+      onChange={handleChange}
+    />
 
+    <input
+      name="email"
+      placeholder="Email"
+      value={form.email}
+      disabled={editingId !== null}
+      onChange={handleChange}
+    />
 
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          disabled={editingId !== null}
-          onChange={handleChange}
-        />
+    <input
+      name="password"
+      type="password"
+      placeholder="Senha (mínimo 6 caracteres)"
+      value={form.password}
+      onChange={handleChange}
+    />
 
+    <select
+      name="profile"
+      value={form.profile}
+      onChange={handleChange}
+    >
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Senha (mínimo 6 caracteres)"
-          value={form.password}
-          onChange={handleChange}
-        />
+      <option value="ADMIN">
+        ADMIN
+      </option>
 
+      <option value="PROFESSOR">
+        PROFESSOR
+      </option>
 
-        <select
-          name="profile"
-          value={form.profile}
-          onChange={handleChange}
-        >
+      <option value="COORDENADOR">
+        COORDENADOR
+      </option>
 
-          <option value="ADMIN">
-            ADMIN
-          </option>
+      <option value="ALUNO">
+        ALUNO
+      </option>
 
-          <option value="PROFESSOR">
-            PROFESSOR
-          </option>
+      <option value="AVALIADOR_EXTERNO">
+        AVALIADOR_EXTERNO
+      </option>
 
-            <option value="COORDENADOR">
-             COORDENADOR
-            </option>
-
-            <option value="ALUNO">
-            ALUNO
-            </option>
-
-            <option value="AVALIADOR_EXTERNO">
-             AVALIADOR_EXTERNO
-            </option>
-
-        </select>
+    </select>
 
 
-        <button onClick={handleCreate}>
-            {editingId ? "Atualizar" : "Criar"}
-        </button>
+    <div className="form-buttons">
 
-        <button onClick={() => {
+      <button onClick={handleCreate}>
+        Salvar
+      </button>
+
+
+      <button
+        onClick={() => {
 
           setShowForm(false);
 
@@ -289,19 +330,21 @@ function handleEdit(user) {
             profile: "PROFESSOR"
           });
 
-        }}>
-          Cancelar
-        </button>
+        }}
+      >
+        Cancelar
+      </button>
 
-          <hr />
-          </>
-        )}
+    </div>
+
+  </div>
+)}
 
       <section>
 
         <h2>Lista de usuários</h2>
 
-
+        <div className="table-card">
         <table>
 
           <thead>
@@ -319,7 +362,7 @@ function handleEdit(user) {
 
           <tbody>
 
-          {users.map((user)=>(
+          {filteredUsers.map((user)=>(
 
             <tr key={user.id}>
 
@@ -331,17 +374,23 @@ function handleEdit(user) {
 
               <td>{user.profile}</td>
 
-              <td>
+                <td>
 
-                <button onClick={() => handleEdit(user)}>
-                  Editar
-                </button>
+  <div className="actions">
 
-                {currentUser?.profile === "ADMIN" && (
-                <button onClick={() => handleDelete(user.id)}>
-                  Excluir
-                </button>
-)}
+    {canEditUser(user) && (
+      <button onClick={() => handleEdit(user)}>
+        Editar
+      </button>
+    )}
+
+    {currentUser?.profile === "ADMIN" && (
+      <button onClick={() => handleDelete(user.id)}>
+        Excluir
+      </button>
+    )}
+
+  </div>
 
               </td>
 
@@ -352,7 +401,7 @@ function handleEdit(user) {
           </tbody>
 
         </table>
-
+          </div>
 
       </section>
 

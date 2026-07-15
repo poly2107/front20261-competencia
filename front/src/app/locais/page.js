@@ -1,7 +1,9 @@
 'use client';
 
+import "./locais.css";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
+
 
 import {
   getLocais,
@@ -15,6 +17,7 @@ export default function LocaisPage() {
 
 
   const [locais, setLocais] = useState([]);
+  const [search,setSearch]=useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -109,9 +112,7 @@ export default function LocaisPage() {
 
 
         await updateLocal(editingId, {
-
-          numero: form.numero
-
+          numero: form.numero,
         });
 
 
@@ -123,9 +124,7 @@ export default function LocaisPage() {
 
 
         await createLocal({
-
-          numero: form.numero
-
+          numero: form.numero,
         });
 
 
@@ -250,31 +249,52 @@ const canManageLocal =
   currentUser?.profile === "ADMIN" ||
   currentUser?.profile === "COORDENADOR";
 
+  const filteredLocais = locais.filter((local)=>{
+    const texto = search.toLowerCase();
+    return (
+
+    String(local.id).includes(search) ||
+
+    local.numero
+    .toLowerCase()
+    .includes(search.toLowerCase())
+
+    );
+    });
+
   return (
 
-    <main>
-
+    <main className="page-container">
 
       <Navbar />
 
 
 
-      <h1>Locais</h1>
+      <h1 className="page-title">
+        Locais
+      </h1>
+    
+<div className="top-bar">
 
+  <input
+    className="search"
+    placeholder="Buscar por ID ou número da mesa"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
 
+  {canManageLocal && (
+    <button onClick={() => setShowForm(true)}>
+      + Novo local
+    </button>
+  )}
 
-      {canManageLocal && (
-        <button onClick={() => setShowForm(true)}>
-          Novo local
-        </button>
-      )}
-
-
+</div>
 
 
       {showForm && canManageLocal && (
 
-        <div>
+        <div className="form-card">
 
 
           <h2>
@@ -286,35 +306,25 @@ const canManageLocal =
 
 
           <input
-
             type="text"
-
             name="numero"
-
-            placeholder="Número do local"
-
+            placeholder="Número da mesa"
             value={form.numero}
-
             onChange={handleChange}
-
           />
 
 
+          <div className="form-buttons">
 
           <button onClick={handleSave}>
-
             Salvar
-
           </button>
-
-
-
 
           <button onClick={handleCancel}>
-
             Cancelar
-
           </button>
+
+        </div>
 
 
 
@@ -339,9 +349,7 @@ const canManageLocal =
 
       </h2>
 
-
-
-
+      <div className="table-card">
       <table>
 
 
@@ -352,7 +360,7 @@ const canManageLocal =
 
             <th>ID</th>
 
-            <th>Número</th>
+            <th>Número da mesa</th>
 
             <th>Ações</th>
 
@@ -369,7 +377,7 @@ const canManageLocal =
 
 
 
-          {locais.map((local) => (
+          {filteredLocais.map((local)=>(
 
 
 
@@ -389,7 +397,6 @@ const canManageLocal =
                 {local.numero}
 
               </td>
-
 
 
               <td>
@@ -428,6 +435,7 @@ const canManageLocal =
 
 
       </table>
+      </div>
 
 
 

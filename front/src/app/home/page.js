@@ -1,48 +1,79 @@
 "use client";
 
+import "./home.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 
-export default function Home(){
+export default function Home() {
 
- const router = useRouter();
- const [user, setUser] = useState(null);
+  const router = useRouter();
 
- useEffect(() => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+
+  const token = localStorage.getItem("token");
   const savedUser = localStorage.getItem("user");
 
-  if(savedUser){
-    setUser(JSON.parse(savedUser));
+  if(!token || !savedUser){
+
+    router.push("/login");
+
+    return;
+
   }
 
-}, []);
+  setUser(JSON.parse(savedUser));
+  }, []);
 
- return (
-  <main>
+  return (
 
-   <Navbar />
+    <main className="page-container">
+      
+      <Navbar />
 
-   <h1>
-    Sistema de Gestão de Projetos Integradores
-   </h1>
+      <h1 className="title">
+        Sistema de Gestão de Projetos Integradores
+      </h1>
 
-   <h2>
-    Bem-vindo, {user?.username}!
-    </h2>
+      <h2 className="subtitle">
+        Bem-vindo(a), {user?.username}!
+      </h2>
+
+      <div className="cards">
+
+        <div
+          className="card"
+          onClick={() => router.push("/usuarios")}
+        >
+
+          <h3>👤 Usuários</h3>
+
+          <p>
+            Consultar usuários cadastrados.
+          </p>
+
+        </div>
 
 
-   <button onClick={() => router.push("/usuarios")}>
-     Usuários
-   </button>
+        <div
+          className="card"
+          onClick={() => router.push("/locais")}
+        >
 
+          <h3>📍 Locais</h3>
 
-   <button onClick={() => router.push("/locais")}>
-     Locais
-   </button>
+          <p>
+            Consultar locais cadastrados.
+          </p>
 
+        </div>
 
-  </main>
- );
+      </div>
+
+    </main>
+
+  );
 
 }
