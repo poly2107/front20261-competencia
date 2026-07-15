@@ -27,7 +27,7 @@ export default function LoginPage() {
     localStorage.setItem("user", JSON.stringify(data.user));
 
 
-    router.push("/");
+    router.push("/home");
   } catch (error) {
     alert(error.message);
   }
@@ -60,8 +60,6 @@ export default function LoginPage() {
       <FormInput label="Email" type="email" name="email" value={user.email} onChange={handleChange} />
       <FormInput label="Password" type="password" name="password" value={user.password} onChange={handleChange} />
       <Button type="submit" onClick={authenticate}>Login</Button>
-      <Button type="button" onClick={() => console.log("Redirecionar para cadastro")}>Cadastrar</Button>
-      <Button type="button" onClick={loadBootstrap}>Carregar Bootstrap</Button>
     </div>
   );
 }

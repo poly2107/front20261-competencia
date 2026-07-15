@@ -13,9 +13,11 @@ import {
 
 export default function LocaisPage() {
 
-  const [locais, setLocais] = useState([]);
 
+  const [locais, setLocais] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [form, setForm] = useState({
     numero: ""
@@ -31,7 +33,8 @@ export default function LocaisPage() {
 
       setLocais(data);
 
-    } catch (error) {
+
+    } catch(error) {
 
       alert(error.message);
 
@@ -43,9 +46,19 @@ export default function LocaisPage() {
 
   useEffect(() => {
 
-    loadLocais();
+  const savedUser = localStorage.getItem("user");
 
-  }, []);
+  if(savedUser){
+
+    setCurrentUser(JSON.parse(savedUser));
+
+  }
+
+
+  loadLocais();
+
+}, []);
+
 
 
 
@@ -53,6 +66,7 @@ export default function LocaisPage() {
   function handleChange(e) {
 
     const { name, value } = e.target;
+
 
     setForm({
       ...form,
@@ -64,10 +78,12 @@ export default function LocaisPage() {
 
 
 
+
+
   async function handleSave() {
 
 
-    if (!form.numero.trim()) {
+    if(!form.numero.trim()) {
 
       alert("O número do local é obrigatório.");
 
@@ -76,7 +92,7 @@ export default function LocaisPage() {
     }
 
 
-    if (form.numero.length > 40) {
+    if(form.numero.length > 40) {
 
       alert("O número do local deve possuir no máximo 40 caracteres.");
 
@@ -89,22 +105,27 @@ export default function LocaisPage() {
     try {
 
 
-      if (editingId) {
+      if(editingId) {
 
 
         await updateLocal(editingId, {
+
           numero: form.numero
+
         });
 
 
         alert("Local atualizado com sucesso!");
 
 
+
       } else {
 
 
         await createLocal({
+
           numero: form.numero
+
         });
 
 
@@ -114,19 +135,13 @@ export default function LocaisPage() {
 
 
 
-      setForm({
-        numero: ""
-      });
-
-
-      setEditingId(null);
-
+      handleCancel();
 
       loadLocais();
 
 
 
-    } catch (error) {
+    } catch(error) {
 
 
       alert(error.message);
@@ -141,10 +156,15 @@ export default function LocaisPage() {
 
 
 
+
+
   function handleEdit(local) {
 
 
     setEditingId(local.id);
+
+
+    setShowForm(true);
 
 
     setForm({
@@ -160,7 +180,47 @@ export default function LocaisPage() {
 
 
 
+
+
+  function handleCancel() {
+
+
+    setShowForm(false);
+
+
+    setEditingId(null);
+
+
+    setForm({
+
+      numero: ""
+
+    });
+
+
+  }
+
+
+
+
+
+
+
+
   async function handleDelete(id) {
+
+
+    const confirmDelete = window.confirm(
+      "Deseja realmente excluir este local?"
+    );
+
+
+    if(!confirmDelete) {
+
+      return;
+
+    }
+
 
 
     try {
@@ -186,47 +246,84 @@ export default function LocaisPage() {
 
 
   }
-
-
-
-
+const canManageLocal =
+  currentUser?.profile === "ADMIN" ||
+  currentUser?.profile === "COORDENADOR";
 
   return (
 
     <main>
 
+
       <Navbar />
+
 
 
       <h1>Locais</h1>
 
 
-      <div>
 
-
-        <input
-
-          type="text"
-
-          name="numero"
-
-          placeholder="Número do local"
-
-          value={form.numero}
-
-          onChange={handleChange}
-
-        />
-
-
-        <button onClick={handleSave}>
-
-          {editingId ? "Atualizar" : "Criar"}
-
+      {canManageLocal && (
+        <button onClick={() => setShowForm(true)}>
+          Novo local
         </button>
+      )}
 
 
-      </div>
+
+
+      {showForm && canManageLocal && (
+
+        <div>
+
+
+          <h2>
+
+            {editingId ? "Editar local" : "Novo local"}
+
+          </h2>
+
+
+
+          <input
+
+            type="text"
+
+            name="numero"
+
+            placeholder="Número do local"
+
+            value={form.numero}
+
+            onChange={handleChange}
+
+          />
+
+
+
+          <button onClick={handleSave}>
+
+            Salvar
+
+          </button>
+
+
+
+
+          <button onClick={handleCancel}>
+
+            Cancelar
+
+          </button>
+
+
+
+        </div>
+
+      )}
+
+
+
 
 
 
@@ -234,10 +331,22 @@ export default function LocaisPage() {
 
 
 
+
+
+      <h2>
+
+        Lista de locais
+
+      </h2>
+
+
+
+
       <table>
 
 
         <thead>
+
 
           <tr>
 
@@ -249,14 +358,20 @@ export default function LocaisPage() {
 
           </tr>
 
+
         </thead>
+
+
 
 
 
         <tbody>
 
 
+
           {locais.map((local) => (
+
+
 
             <tr key={local.id}>
 
@@ -268,6 +383,7 @@ export default function LocaisPage() {
               </td>
 
 
+
               <td>
 
                 {local.numero}
@@ -275,36 +391,44 @@ export default function LocaisPage() {
               </td>
 
 
+
               <td>
 
 
+                {canManageLocal && (
                 <button onClick={() => handleEdit(local)}>
-
                   Editar
-
                 </button>
+                )}
 
 
 
-                <button onClick={() => handleDelete(local.id)}>
-
+                {canManageLocal && (
+               <button onClick={() => handleDelete(local.id)}>
                   Excluir
+               </button>
+                )}
 
-                </button>
 
 
               </td>
 
 
+
             </tr>
 
+
+
           ))}
+
 
 
         </tbody>
 
 
+
       </table>
+
 
 
     </main>

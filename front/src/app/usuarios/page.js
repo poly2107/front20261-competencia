@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import {
   getUsers,
@@ -13,8 +14,10 @@ import {
 export default function UsuariosPage() {
 
   const [users, setUsers] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const router = useRouter();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -158,6 +161,8 @@ function handleEdit(user) {
 
   setEditingId(user.id);
 
+  setShowForm(true);
+
   setForm({
     username: user.username,
     email: user.email,
@@ -169,19 +174,31 @@ function handleEdit(user) {
 
   async function handleDelete(id) {
 
-    try {
+  const confirmDelete = window.confirm(
+    "Deseja realmente excluir este usuário?"
+  );
 
-      await deleteUser(id);
 
-      alert("Usuário removido!");
+  if(!confirmDelete){
+    return;
+  }
 
-      loadUsers();
 
-    } catch(error) {
-      alert(error.message);
-    }
+  try {
+
+    await deleteUser(id);
+
+    alert("Usuário removido!");
+
+    loadUsers();
+
+  } catch(error) {
+
+    alert(error.message);
 
   }
+
+}
 
   const isAdmin = currentUser?.profile === "ADMIN";
 
@@ -192,8 +209,12 @@ function handleEdit(user) {
 
       <h1>Usuários</h1>
 
-        <h2>Novo usuário</h2>
         {isAdmin && (
+          <button onClick={() => setShowForm(true)}>
+            Novo usuário
+          </button>
+)}
+        {showForm && (
         <>
 
         <input
@@ -254,11 +275,27 @@ function handleEdit(user) {
         <button onClick={handleCreate}>
             {editingId ? "Atualizar" : "Criar"}
         </button>
+
+        <button onClick={() => {
+
+          setShowForm(false);
+
+          setEditingId(null);
+
+          setForm({
+            username: "",
+            email: "",
+            password: "",
+            profile: "PROFESSOR"
+          });
+
+        }}>
+          Cancelar
+        </button>
+
           <hr />
           </>
         )}
-
-
 
       <section>
 
